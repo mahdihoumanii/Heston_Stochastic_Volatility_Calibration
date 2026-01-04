@@ -113,7 +113,21 @@ Run notebooks in order:
 - Real-market calibration requires bid/ask handling and weighting schemes
 - The Heston model may not fit all maturities simultaneously without extensions
   (e.g. jumps or time-dependent parameters)
+---
 
+## Project Report
+
+A full written report for this project is available as a PDF:
+
+- **`reports/main.pdf`** — comprehensive report including:
+  - Heston model formulation
+  - Pricing and implied volatility analysis
+  - Synthetic calibration setup
+  - Parameter recovery results
+  - IV fit diagnostics and error heatmaps
+  - Discussion of numerical stability and limitations
+
+The report is generated from `reports/main.tex` and all figures are produced directly from the notebooks in this repository.
 ---
 
 ## Author
