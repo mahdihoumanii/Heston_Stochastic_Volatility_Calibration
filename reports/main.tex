@@ -1,0 +1,141 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{microtype}
+
+\title{\textbf{Heston Stochastic Volatility: Pricing and Calibration (Synthetic Study)}}
+\author{Mohamad ElMahdi Houmani}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Overview}
+This report documents a small quantitative finance project implementing the Heston stochastic volatility model for European option pricing, implied volatility (IV) inversion, and parameter calibration on synthetic option data. The workflow includes: (i) Heston semi-closed-form pricing (via characteristic function integration), (ii) robust IV inversion with no-arbitrage checks, and (iii) calibration of Heston parameters to a synthetic option surface with diagnostics and visual comparisons.
+
+\section{Model}
+Under the Heston model (risk-neutral measure), the spot price $S_t$ and instantaneous variance $v_t$ evolve as:
+\begin{align}
+dS_t &= (r-q) S_t\, dt + \sqrt{v_t}\, S_t\, dW_t^{(1)},\\
+dv_t &= \kappa(\theta - v_t)\, dt + \sigma \sqrt{v_t}\, dW_t^{(2)},\\
+dW_t^{(1)}\, dW_t^{(2)} &= \rho\, dt,
+\end{align}
+where $r$ is the risk-free rate, $q$ is the dividend yield, $\kappa$ the mean reversion speed, $\theta$ the long-run variance, $\sigma$ the volatility of variance, and $\rho$ the correlation (driving the skew).
+
+\paragraph{Feller condition.}
+A sufficient condition to keep $v_t$ strictly positive is:
+\begin{equation}
+2\kappa\theta \ge \sigma^2.
+\end{equation}
+In practice, the Feller condition can be violated while pricing remains well-defined; empirical calibrations often do not strictly satisfy it.
+
+\section{Pricing and Implied Volatility}
+European call/put prices are computed via the standard Heston characteristic-function approach (``Little Heston Trap'' style formulation) with consistent probability integrals. Implied volatilities are obtained by inverting the Black--Scholes price using a robust solver with no-arbitrage clipping to handle numerical edge cases.
+
+\subsection{Heston implied volatility smile}
+Figure~\ref{fig:heston_smile} shows the implied volatility smile at $T=1$ year for a representative parameter set. Negative correlation $\rho<0$ produces an equity-like skew: higher IV for low strikes and lower IV for high strikes.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/heston_iv_smile_T1y.png}
+\caption{Heston implied volatility smile at $T=1$ year.}
+\label{fig:heston_smile}
+\end{figure}
+
+\subsection{Heston call price surface}
+Figure~\ref{fig:heston_surface} shows the call price surface across strikes and maturities. Prices decrease with strike and increase with maturity, as expected, and remain within no-arbitrage bounds.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/heston_surface.png}
+\caption{Heston call price surface over strikes and maturities.}
+\label{fig:heston_surface}
+\end{figure}
+
+\section{Synthetic Calibration Setup}
+A synthetic option chain is generated from a chosen set of ``true'' Heston parameters over a grid of strikes and maturities. Small noise may be added to prices to mimic market imperfections. Calibration then solves:
+\begin{equation}
+\hat{\vartheta} = \arg\min_{\vartheta}\; \mathcal{L}(\vartheta),
+\end{equation}
+where $\vartheta=(\kappa,\theta,\sigma,\rho,v_0)$ and $\mathcal{L}$ is an objective defined on either option prices or implied volatilities (depending on the target).
+
+\subsection{Synthetic price distribution}
+Figure~\ref{fig:synthetic_prices} visualizes synthetic option prices pooled across maturities as a function of strike.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/calibration_prices.png}
+\caption{Synthetic option prices versus strike (pooled maturities).}
+\label{fig:synthetic_prices}
+\end{figure}
+
+\section{Calibration Results}
+This section compares recovered parameters to the true parameters and evaluates the fit in implied volatility space.
+
+\subsection{True vs calibrated parameters}
+Figure~\ref{fig:param_compare} shows the calibrated parameters alongside the true parameters used in the synthetic generator. Relative errors are also shown in basis points to make small differences visible.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.49\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{figures/params_true_vs_calibrated.png}
+  \caption{True vs calibrated values.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.49\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{figures/params_relative_error_bp.png}
+  \caption{Relative error (basis points).}
+\end{subfigure}
+\caption{Parameter recovery from synthetic calibration.}
+\label{fig:param_compare}
+\end{figure}
+
+\subsection{IV fit at $T=1$ year}
+Figure~\ref{fig:iv_fit} compares the synthetic ``market'' IV smile at $T=1$ year to the IV smile implied by model prices under the calibrated parameters. Close overlap indicates a successful calibration in volatility space.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/iv_fit_T1.png}
+\caption{IV fit at $T=1$ year: synthetic market IV vs calibrated model IV.}
+\label{fig:iv_fit}
+\end{figure}
+
+\subsection{IV error heatmap}
+Figure~\ref{fig:iv_heatmap} shows the IV error across the strike--maturity grid:
+\[
+\Delta \sigma_{\text{IV}} = \sigma_{\text{model}} - \sigma_{\text{market}}.
+\]
+This highlights localized regions where the model under/over-estimates the synthetic surface. Small residual patterns can arise from noise, numerical integration tolerance, and IV inversion sensitivity (especially deep ITM/OTM).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{figures/iv_error_heatmap.png}
+\caption{IV error heatmap across strikes and maturities (model minus market).}
+\label{fig:iv_heatmap}
+\end{figure}
+
+\section{Discussion}
+\paragraph{Interpretation.}
+The calibrated parameters closely match the true generating parameters in the synthetic experiment, and the IV fit indicates strong agreement. The negative correlation $\rho$ drives the skew commonly observed in equity option markets.
+
+\paragraph{Numerical stability.}
+The project includes no-arbitrage checks (price bounds), robust IV inversion, and sanity tests such as the Black--Scholes limiting regime (near-constant volatility). These checks are important in practice to avoid silent numerical failures.
+
+\section{Limitations and Next Steps}
+\begin{itemize}
+  \item \textbf{Synthetic data:} Real market calibration would require real option chains (bid/ask handling, filtering, weighting).
+  \item \textbf{Objective choices:} Calibrating to price vs IV can change sensitivity and parameter identifiability.
+  \item \textbf{Model risk:} Heston may not fit all maturities simultaneously without extensions (jumps, time-dependent parameters).
+  \item \textbf{Next steps:} Add weighting by vega / bid-ask, incorporate constraints (including optional Feller), and run calibration on real option data.
+\end{itemize}
+
+\end{document}

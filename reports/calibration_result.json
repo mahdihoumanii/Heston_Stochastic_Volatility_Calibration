@@ -1,0 +1,22 @@
+{
+  "params": {
+    "kappa": 1.5145036651154018,
+    "theta": 0.04039120789100607,
+    "sigma": 0.45460918406268663,
+    "rho": -0.6688695973442288,
+    "v0": 0.03952570024210672
+  },
+  "cost": 0.10227959211454785,
+  "success": true,
+  "message": "`ftol` termination condition is satisfied.",
+  "feller": false,
+  "nfev": 10,
+  "rmse": 0.03820697133339024,
+  "timestamp": "2026-01-04T11:16:55.051248Z",
+  "metadata": {
+    "seed": 42,
+    "target": "iv",
+    "synthetic": true,
+    "noise": 0.005
+  }
+}

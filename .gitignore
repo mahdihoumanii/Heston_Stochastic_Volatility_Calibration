@@ -1,0 +1,75 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+pip-wheel-metadata/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Packaging / tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# =========================
+# Jupyter / Notebooks
+# =========================
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# =========================
+# OS junk
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.code-workspace
+
+# =========================
+# LaTeX build artifacts (keep .tex + figures)
+# =========================
+reports/*.aux
+reports/*.bbl
+reports/*.bcf
+reports/*.blg
+reports/*.fdb_latexmk
+reports/*.fls
+reports/*.log
+reports/*.out
+reports/*.run.xml
+reports/*.synctex.gz
+reports/*.toc
+
+# =========================
+# Data / outputs (optional)
+# =========================
+# If you generate large local datasets, ignore them here:
+# data/
+# outputs/
+
+# If calibration_result.json is generated each run and you don't want it tracked, uncomment:
+# reports/calibration_result.json
